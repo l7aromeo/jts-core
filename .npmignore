@@ -1,0 +1,40 @@
+# Source files
+src/
+
+# Tests
+tests/
+**/*.test.ts
+**/*.spec.ts
+vitest.config.ts
+coverage/
+
+# Examples
+examples/
+
+# Config files
+tsconfig.json
+.eslintrc*
+.prettierrc*
+.editorconfig
+
+# Development files
+.env*
+.gitignore
+.github/
+.vscode/
+
+# Documentation source
+docs/
+*.md
+!README.md
+!CHANGELOG.md
+
+# JTS Specification (development reference)
+JTS_Specification_v1.md
+
+# Misc
+*.log
+*.tgz
+.DS_Store
+Thumbs.db
+node_modules/
