@@ -28,6 +28,7 @@ npm install @jts/core
 ```
 
 For CLI tools globally:
+
 ```bash
 npm install -g @jts/core
 ```
@@ -37,23 +38,23 @@ npm install -g @jts/core
 ### 1. Setup Auth Server
 
 ```typescript
-import { JTSAuthServer, generateKeyPair } from '@jts/core';
+import {JTSAuthServer, generateKeyPair} from '@jts/core';
 
 // Generate signing key
 const signingKey = await generateKeyPair('my-key-2025', 'RS256');
 
 // Create auth server
 const authServer = new JTSAuthServer({
-profile: 'JTS-S/v1',
-signingKey,
-bearerPassLifetime: 300, // 5 minutes
-stateProofLifetime: 604800, // 7 days
+  profile: 'JTS-S/v1',
+  signingKey,
+  bearerPassLifetime: 300, // 5 minutes
+  stateProofLifetime: 604800, // 7 days
 });
 
 // Login user
 const tokens = await authServer.login({
-prn: 'user-123',
-permissions: ['read:profile', 'write:posts'],
+  prn: 'user-123',
+  permissions: ['read:profile', 'write:posts'],
 });
 
 console.log(tokens.bearerPass); // Use in Authorization header
@@ -63,18 +64,18 @@ console.log(tokens.stateProof); // Store in HttpOnly cookie
 ### 2. Setup Resource Server
 
 ```typescript
-import { JTSResourceServer } from '@jts/core';
+import {JTSResourceServer} from '@jts/core';
 
 const resourceServer = new JTSResourceServer({
-publicKeys: [signingKey],
-audience: 'https://api.example.com',
+  publicKeys: [signingKey],
+  audience: 'https://api.example.com',
 });
 
 // Verify token
 const result = await resourceServer.verify(bearerPass);
 if (result.valid) {
-console.log('User:', result.payload.prn);
-console.log('Permissions:', result.payload.perm);
+  console.log('User:', result.payload.prn);
+  console.log('Permissions:', result.payload.perm);
 }
 ```
 
@@ -82,18 +83,18 @@ console.log('Permissions:', result.payload.perm);
 
 ```typescript
 import express from 'express';
-import { jtsAuth, jtsRequirePermissions, createJTSRoutes } from '@jts/core';
+import {jtsAuth, jtsRequirePermissions, createJTSRoutes} from '@jts/core';
 
 const app = express();
 
 // Create routes
 const routes = createJTSRoutes({
-authServer,
-validateCredentials: async (req) => {
-const { email, password } = req.body;
+  authServer,
+  validateCredentials: async (req) => {
+    const {email, password} = req.body;
 // Validate credentials...
-return { prn: email, permissions: ['read:profile'] };
-},
+    return {prn: email, permissions: ['read:profile']};
+  },
 });
 
 // Mount auth endpoints
@@ -103,25 +104,25 @@ app.post('/jts/logout', routes.logoutHandler);
 
 // Protected routes
 app.get('/api/profile',
-jtsAuth({ resourceServer }),
-(req, res) => {
-res.json({ user: req.jts.payload.prn });
-}
+  jtsAuth({resourceServer}),
+  (req, res) => {
+    res.json({user: req.jts.payload.prn});
+  }
 );
 
 // Permission-protected routes
 app.get('/api/admin',
-jtsAuth({ resourceServer }),
-jtsRequirePermissions({ required: ['admin:access'] }),
-(req, res) => {
-res.json({ message: 'Admin area' });
-}
+  jtsAuth({resourceServer}),
+  jtsRequirePermissions({required: ['admin:access']}),
+  (req, res) => {
+    res.json({message: 'Admin area'});
+  }
 );
 ```
 
 ## 🔧 CLI Tools
 
-The \`jts\` CLI provides utilities for key management and token inspection.
+The `jts` CLI provides utilities for key management and token inspection.
 
 ### Installation
 
@@ -138,7 +139,7 @@ npx @jts/core jts --help
 
 ### Commands
 
-#### \`jts keygen\` - Generate Key Pairs
+#### `jts keygen` - Generate Key Pairs
 
 ```bash
 
@@ -161,14 +162,14 @@ jts keygen -a ES256 --kid my-key-2025-001 -o key.pem
 
 Options:
 
-- \`-a, --algorithm <alg>\` - Algorithm (RS256, RS384, RS512, ES256, ES384, ES512, PS256, PS384, PS512)
-- \`-k, --kid <kid>\` - Key ID (auto-generated if not specified)
-- \`-b, --bits <bits>\` - RSA key size in bits (default: 2048)
-- \`-o, --output <file>\` - Output file for private key
-- \`-p, --public-out <file>\` - Output file for public key
-- \`-f, --format <format>\` - Output format: \`pem\` or \`jwk\`
+- `-a, --algorithm <alg>` - Algorithm (RS256, RS384, RS512, ES256, ES384, ES512, PS256, PS384, PS512)
+- `-k, --kid <kid>` - Key ID (auto-generated if not specified)
+- `-b, --bits <bits>` - RSA key size in bits (default: 2048)
+- `-o, --output <file>` - Output file for private key
+- `-p, --public-out <file>` - Output file for public key
+- `-f, --format <format>` - Output format: `pem` or `jwk`
 
-#### \`jts inspect\` - Decode Token Contents
+#### `jts inspect` - Decode Token Contents
 
 ```bash
 
@@ -192,7 +193,7 @@ Output includes:
 - Timestamp information
 - Expiration status
 
-#### \`jts verify\` - Verify Token Signature
+#### `jts verify` - Verify Token Signature
 
 ```bash
 
@@ -215,10 +216,10 @@ jts verify <token> --jwks ./jwks.json
 
 Options:
 
-- \`-k, --key <file>\` - Public key file (PEM or JWK)
-- \`--jwks <url-or-file>\` - JWKS URL or file path
+- `-k, --key <file>` - Public key file (PEM or JWK)
+- `--jwks <url-or-file>` - JWKS URL or file path
 
-#### \`jts jwks\` - Convert to JWKS Format
+#### `jts jwks` - Convert to JWKS Format
 
 ```bash
 
@@ -237,10 +238,10 @@ jts jwks public-key.pem --kid my-key-2025
 
 Options:
 
-- \`-o, --output <file>\` - Output file
-- \`-k, --kid <kid>\` - Key ID for PEM files
+- `-o, --output <file>` - Output file
+- `-k, --kid <kid>` - Key ID for PEM files
 
-#### \`jts init\` - Initialize JTS Configuration
+#### `jts init` - Initialize JTS Configuration
 
 ```bash
 
@@ -259,19 +260,19 @@ jts init --profile JTS-S -o ./config --force
 
 Options:
 
-- \`--profile <profile>\` - JTS profile: JTS-L, JTS-S, or JTS-C
-- \`-a, --algorithm <alg>\` - Signing algorithm
-- \`-o, --output <dir>\` - Output directory
-- \`-f, --force\` - Overwrite existing directory
+- `--profile <profile>` - JTS profile: JTS-L, JTS-S, or JTS-C
+- `-a, --algorithm <alg>` - Signing algorithm
+- `-o, --output <dir>` - Output directory
+- `-f, --force` - Overwrite existing directory
 
 Generated files:
 
-- \`jts.config.json\` - Configuration file
-- \`signing-key.pem\` - Private signing key
-- \`signing-key.pub.pem\` - Public signing key
-- \`jwks.json\` - JWKS public keys
-- \`example.ts\` - Example usage code
-- \`.gitignore\` - Prevents committing private keys
+- `jts.config.json` - Configuration file
+- `signing-key.pem` - Private signing key
+- `signing-key.pub.pem` - Public signing key
+- `jwks.json` - JWKS public keys
+- `example.ts` - Example usage code
+- `.gitignore` - Prevents committing private keys
 
 ## 📊 Profiles Comparison
 
@@ -289,11 +290,11 @@ Generated files:
 ### In-Memory (Development)
 
 ```typescript
-import { InMemorySessionStore } from '@jts/core';
+import {InMemorySessionStore} from '@jts/core';
 
 const store = new InMemorySessionStore();
 const authServer = new JTSAuthServer({
-sessionStore: store,
+  sessionStore: store,
 // ...other options
 });
 ```
@@ -301,17 +302,17 @@ sessionStore: store,
 ### Redis (Production)
 
 ```typescript
-import { RedisSessionStore } from '@jts/core';
+import {RedisSessionStore} from '@jts/core';
 import Redis from 'ioredis';
 
 const redis = new Redis();
 const store = new RedisSessionStore({
-client: redis,
-keyPrefix: 'jts:',
+  client: redis,
+  keyPrefix: 'jts:',
 });
 
 const authServer = new JTSAuthServer({
-sessionStore: store,
+  sessionStore: store,
 // ...other options
 });
 ```
@@ -319,20 +320,20 @@ sessionStore: store,
 ### PostgreSQL (Production)
 
 ```typescript
-import { PostgresSessionStore } from '@jts/core';
-import { Pool } from 'pg';
+import {PostgresSessionStore} from '@jts/core';
+import {Pool} from 'pg';
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const pool = new Pool({connectionString: process.env.DATABASE_URL});
 const store = new PostgresSessionStore({
-pool,
-tableName: 'jts_sessions',
+  pool,
+  tableName: 'jts_sessions',
 });
 
 // Initialize table (run once)
 await store.initialize();
 
 const authServer = new JTSAuthServer({
-sessionStore: store,
+  sessionStore: store,
 // ...other options
 });
 ```
@@ -342,7 +343,7 @@ sessionStore: store,
 ### Key Generation
 
 ```typescript
-import { generateKeyPair, generateRSAKeyPair, generateECKeyPair } from '@jts/core';
+import {generateKeyPair, generateRSAKeyPair, generateECKeyPair} from '@jts/core';
 
 // Auto-select based on algorithm
 const key = await generateKeyPair('key-id', 'RS256');
@@ -383,16 +384,16 @@ const jwks = authServer.getJWKS();
 
 ### CSRF Protection
 
-All mutating endpoints require \`X-JTS-Request: 1\` header:
+All mutating endpoints require `X-JTS-Request: 1` header:
 
 ```typescript
 fetch('/jts/login', {
-method: 'POST',
-headers: {
-'Content-Type': 'application/json',
-'X-JTS-Request': '1', // Required for CSRF protection
-},
-body: JSON.stringify(credentials),
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'X-JTS-Request': '1', // Required for CSRF protection
+  },
+  body: JSON.stringify(credentials),
 });
 ```
 
@@ -420,24 +421,24 @@ Handle in-flight requests during token expiry:
 
 ```typescript
 const resourceServer = new JTSResourceServer({
-gracePeriodTolerance: 30, // Accept tokens up to 30s after expiry
+  gracePeriodTolerance: 30, // Accept tokens up to 30s after expiry
 });
 ```
 
 ## 📱 Client SDK
 
 ```typescript
-import { JTSClient } from '@jts/core';
+import {JTSClient} from '@jts/core';
 
 const client = new JTSClient({
-authServerUrl: 'https://auth.example.com',
-autoRenewBefore: 60, // Renew 1 minute before expiry
+  authServerUrl: 'https://auth.example.com',
+  autoRenewBefore: 60, // Renew 1 minute before expiry
 });
 
 // Login
 const result = await client.login({
-email: 'user@example.com',
-password: 'password123',
+  email: 'user@example.com',
+  password: 'password123',
 });
 
 // Auto-refreshing fetch
@@ -454,21 +455,21 @@ await client.logout();
 ## 🔴 Error Handling
 
 ```typescript
-import { JTSError } from '@jts/core';
+import {JTSError} from '@jts/core';
 
 try {
-const result = await resourceServer.verify(token);
+  const result = await resourceServer.verify(token);
 } catch (error) {
-if (error instanceof JTSError) {
-console.log(error.errorCode); // 'JTS-401-01'
-console.log(error.errorKey); // 'bearer_expired'
-console.log(error.action); // 'renew'
-console.log(error.httpStatus); // 401
+  if (error instanceof JTSError) {
+    console.log(error.errorCode); // 'JTS-401-01'
+    console.log(error.errorKey); // 'bearer_expired'
+    console.log(error.action); // 'renew'
+    console.log(error.httpStatus); // 401
 
     // Send standard error response
     res.status(error.httpStatus).json(error.toJSON());
 
-}
+  }
 }
 ```
 
@@ -495,72 +496,72 @@ console.log(error.httpStatus); // 401
 
 #### Crypto
 
-- \`generateKeyPair(kid, algorithm)\` - Generate signing key pair
-- \`generateRSAKeyPair(kid, algorithm, modulusLength)\` - Generate RSA key pair
-- \`generateECKeyPair(kid, algorithm)\` - Generate EC key pair
-- \`sign(data, privateKey, algorithm)\` - Sign data
-- \`verify(data, signature, publicKey, algorithm)\` - Verify signature
-- \`pemToJwk(pem, kid, algorithm)\` - Convert PEM to JWK
-- \`jwkToPem(jwk)\` - Convert JWK to PEM
-- \`keyPairToJwks(keyPairs)\` - Convert key pairs to JWKS
+- `generateKeyPair(kid, algorithm)` - Generate signing key pair
+- `generateRSAKeyPair(kid, algorithm, modulusLength)` - Generate RSA key pair
+- `generateECKeyPair(kid, algorithm)` - Generate EC key pair
+- `sign(data, privateKey, algorithm)` - Sign data
+- `verify(data, signature, publicKey, algorithm)` - Verify signature
+- `pemToJwk(pem, kid, algorithm)` - Convert PEM to JWK
+- `jwkToPem(jwk)` - Convert JWK to PEM
+- `keyPairToJwks(keyPairs)` - Convert key pairs to JWKS
 
 #### Tokens
 
-- \`createBearerPass(options)\` - Create a BearerPass token
-- \`verifyBearerPass(token, options)\` - Verify and decode BearerPass
-- \`decodeBearerPass(token)\` - Decode without verification
-- \`isTokenExpired(payload)\` - Check if token is expired
-- \`hasPermission(payload, permission)\` - Check single permission
-- \`hasAllPermissions(payload, permissions)\` - Check all permissions
-- \`hasAnyPermission(payload, permissions)\` - Check any permission
+- `createBearerPass(options)` - Create a BearerPass token
+- `verifyBearerPass(token, options)` - Verify and decode BearerPass
+- `decodeBearerPass(token)` - Decode without verification
+- `isTokenExpired(payload)` - Check if token is expired
+- `hasPermission(payload, permission)` - Check single permission
+- `hasAllPermissions(payload, permissions)` - Check all permissions
+- `hasAnyPermission(payload, permissions)` - Check any permission
 
 #### JWE (JTS-C)
 
-- \`createEncryptedBearerPass(options)\` - Create encrypted JWE token
-- \`decryptJWE(jwe, options)\` - Decrypt JWE token
-- \`verifyEncryptedBearerPass(jwe, options)\` - Decrypt and verify
-- \`isEncryptedToken(token)\` - Check if token is JWE
+- `createEncryptedBearerPass(options)` - Create encrypted JWE token
+- `decryptJWE(jwe, options)` - Decrypt JWE token
+- `verifyEncryptedBearerPass(jwe, options)` - Decrypt and verify
+- `isEncryptedToken(token)` - Check if token is JWE
 
 #### Server
 
-- \`JTSAuthServer\` - Authentication server class
-- \`JTSResourceServer\` - Resource server class
+- `JTSAuthServer` - Authentication server class
+- `JTSResourceServer` - Resource server class
 
 #### Client
 
-- \`JTSClient\` - Client SDK class
-- \`InMemoryTokenStorage\` - Simple token storage
+- `JTSClient` - Client SDK class
+- `InMemoryTokenStorage` - Simple token storage
 
 #### Middleware
 
-- \`jtsAuth(options)\` - Authentication middleware
-- \`jtsOptionalAuth(options)\` - Optional auth middleware
-- \`jtsRequirePermissions(options)\` - Permission middleware
-- \`createJTSRoutes(options)\` - Create route handlers
-- \`mountJTSRoutes(app, options)\` - Mount routes on Express app
+- `jtsAuth(options)` - Authentication middleware
+- `jtsOptionalAuth(options)` - Optional auth middleware
+- `jtsRequirePermissions(options)` - Permission middleware
+- `createJTSRoutes(options)` - Create route handlers
+- `mountJTSRoutes(app, options)` - Mount routes on Express app
 
 #### Stores
 
-- \`InMemorySessionStore\` - In-memory session store
-- \`RedisSessionStore\` - Redis-backed session store
-- \`PostgresSessionStore\` - PostgreSQL-backed session store
+- `InMemorySessionStore` - In-memory session store
+- `RedisSessionStore` - Redis-backed session store
+- `PostgresSessionStore` - PostgreSQL-backed session store
 
 ### JTS Claims
 
-| Claim      | Name               | Description                 |
-|------------|--------------------|-----------------------------|
-| \`prn\`    | Principal          | User/entity identifier      |
-| \`aid\`    | Anchor ID          | Links to session record     |
-| \`tkn_id\` | Token ID           | Unique token identifier     |
-| \`exp\`    | Expiration         | Token expiry timestamp      |
-| \`iat\`    | Issued At          | Token creation timestamp    |
-| \`aud\`    | Audience           | Intended recipient          |
-| \`dfp\`    | Device Fingerprint | Device binding hash         |
-| \`perm\`   | Permissions        | Array of permission strings |
-| \`grc\`    | Grace Period       | Expiry tolerance (seconds)  |
-| \`org\`    | Organization       | Tenant identifier           |
-| \`atm\`    | Auth Method        | How user authenticated      |
-| \`spl\`    | Session Policy     | Concurrent session policy   |
+| Claim    | Name               | Description                 |
+|----------|--------------------|-----------------------------|
+| `prn`    | Principal          | User/entity identifier      |
+| `aid`    | Anchor ID          | Links to session record     |
+| `tkn_id` | Token ID           | Unique token identifier     |
+| `exp`    | Expiration         | Token expiry timestamp      |
+| `iat`    | Issued At          | Token creation timestamp    |
+| `aud`    | Audience           | Intended recipient          |
+| `dfp`    | Device Fingerprint | Device binding hash         |
+| `perm`   | Permissions        | Array of permission strings |
+| `grc`    | Grace Period       | Expiry tolerance (seconds)  |
+| `org`    | Organization       | Tenant identifier           |
+| `atm`    | Auth Method        | How user authenticated      |
+| `spl`    | Session Policy     | Concurrent session policy   |
 
 ## �� Running the Example
 
