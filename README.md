@@ -1,10 +1,10 @@
-# @jts/core
+# jts-core
 
 > **Janus Token System (JTS) SDK for TypeScript/Node.js**
 >
 > A two-component authentication architecture for secure, revocable, and confidential API authentication.
 
-[![npm version](https://img.shields.io/npm/v/@jts/core.svg)](https://www.npmjs.com/package/jts-core)
+[![npm version](https://img.shields.io/npm/v/jts-core.svg)](https://www.npmjs.com/package/jts-core)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
@@ -24,13 +24,13 @@
 ## 📦 Installation
 
 ```bash
-npm install @jts/core
+npm install jts-core
 ```
 
 For CLI tools globally:
 
 ```bash
-npm install -g @jts/core
+npm install -g jts-core
 ```
 
 ## 🚀 Quick Start
@@ -38,7 +38,7 @@ npm install -g @jts/core
 ### 1. Setup Auth Server
 
 ```typescript
-import {JTSAuthServer, generateKeyPair} from '@jts/core';
+import {JTSAuthServer, generateKeyPair} from 'jts-core';
 
 // Generate signing key
 const signingKey = await generateKeyPair('my-key-2025', 'RS256');
@@ -64,7 +64,7 @@ console.log(tokens.stateProof); // Store in HttpOnly cookie
 ### 2. Setup Resource Server
 
 ```typescript
-import {JTSResourceServer} from '@jts/core';
+import {JTSResourceServer} from 'jts-core';
 
 const resourceServer = new JTSResourceServer({
   publicKeys: [signingKey],
@@ -83,7 +83,7 @@ if (result.valid) {
 
 ```typescript
 import express from 'express';
-import {jtsAuth, jtsRequirePermissions, createJTSRoutes} from '@jts/core';
+import {jtsAuth, jtsRequirePermissions, createJTSRoutes} from 'jts-core';
 
 const app = express();
 
@@ -130,11 +130,11 @@ The `jts` CLI provides utilities for key management and token inspection.
 
 # Global installation
 
-npm install -g @jts/core
+npm install -g jts-core
 
 # Or use with npx
 
-npx @jts/core jts --help
+npx jts-core jts --help
 ```
 
 ### Commands
@@ -290,7 +290,7 @@ Generated files:
 ### In-Memory (Development)
 
 ```typescript
-import {InMemorySessionStore} from '@jts/core';
+import {InMemorySessionStore} from 'jts-core';
 
 const store = new InMemorySessionStore();
 const authServer = new JTSAuthServer({
@@ -302,7 +302,7 @@ const authServer = new JTSAuthServer({
 ### Redis (Production)
 
 ```typescript
-import {RedisSessionStore} from '@jts/core';
+import {RedisSessionStore} from 'jts-core';
 import Redis from 'ioredis';
 
 const redis = new Redis();
@@ -320,7 +320,7 @@ const authServer = new JTSAuthServer({
 ### PostgreSQL (Production)
 
 ```typescript
-import {PostgresSessionStore} from '@jts/core';
+import {PostgresSessionStore} from 'jts-core';
 import {Pool} from 'pg';
 
 const pool = new Pool({connectionString: process.env.DATABASE_URL});
@@ -343,7 +343,7 @@ const authServer = new JTSAuthServer({
 ### Key Generation
 
 ```typescript
-import {generateKeyPair, generateRSAKeyPair, generateECKeyPair} from '@jts/core';
+import {generateKeyPair, generateRSAKeyPair, generateECKeyPair} from 'jts-core';
 
 // Auto-select based on algorithm
 const key = await generateKeyPair('key-id', 'RS256');
@@ -400,7 +400,7 @@ fetch('/jts/login', {
 ### Device Fingerprint
 
 ```typescript
-import {createDeviceFingerprint} from '@jts/core';
+import {createDeviceFingerprint} from 'jts-core';
 
 const fingerprint = createDeviceFingerprint({
   userAgent: navigator.userAgent,
@@ -428,7 +428,7 @@ const resourceServer = new JTSResourceServer({
 ## 📱 Client SDK
 
 ```typescript
-import {JTSClient} from '@jts/core';
+import {JTSClient} from 'jts-core';
 
 const client = new JTSClient({
   authServerUrl: 'https://auth.example.com',
@@ -455,7 +455,7 @@ await client.logout();
 ## 🔴 Error Handling
 
 ```typescript
-import {JTSError} from '@jts/core';
+import {JTSError} from 'jts-core';
 
 try {
   const result = await resourceServer.verify(token);
